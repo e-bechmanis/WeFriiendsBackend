@@ -14,8 +14,11 @@ module.exports = (app) => {
       console.log(req.body.name);
       profileService
         .addName(req.user.userId, req.body.name)
-        .then((data) => {
-          res.status(200).json(data);
+        .then((name) => {
+          res.status(200).json({
+            name: name,
+            message: "Name has been successfully updated",
+          });
         })
         .catch((msg) => {
           res.status(422).json({ error: msg });
@@ -60,13 +63,13 @@ module.exports = (app) => {
     "/api/profile/dob",
     passport.authenticate("jwt", { session: false }),
     (req, res) => {
-      console.log(req.body);
+      console.log("body ",req.body);
       //modifying date into <YYYY-mm-dd> format
       let dobString = `<${req.body.year}-${
         req.body.month < 10 ? "0" + req.body.month : req.body.month
       }-${req.body.day < 10 ? "0" + req.body.day : req.body.day}>`;
 
-      console.log(dobString);
+      console.log("dob ",dobString);
 
       dateService
         .addDateOfBirthAndZodiac(req.user.userId, dobString)
@@ -118,8 +121,8 @@ module.exports = (app) => {
     (req, res) => {
       additionalInfoService
         .addReason(req.user.userId, req.body.interests)
-        .then((data) => {
-          res.status(200).json(data);
+        .then((reasons) => {
+          res.status(200).json({ lookingFor: reasons });
         })
         .catch((msg) => {
           res.status(422).json({ error: msg });

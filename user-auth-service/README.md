@@ -33,6 +33,23 @@ POST route, accepts JSON object containing user email and 2 passwords, adds user
     "message": "Pending registration confirmation for /user email/"
 }
 ```
+
+**/api/auth/updatePassword**
+
+PATCH request, accepts JSON object with email, new password and password comfirmation. Checks if email exists in the database. Update user's password if user exists.
+
+**Params**
+```
+{
+    email,
+    password,
+    password2
+}
+Returns: 
+status 200 -if update was successfull
+status 400 - if user not found
+status 422 - if passwords do not match
+```
 ______________________________
 
 **/api/auth/signin**
@@ -65,12 +82,12 @@ ______________________________
 
 **/api/auth/confirm/:confirmationCode**
 
-GET route, changes user status from "Pending" to "Active" if confirmation code passes validity check in the database
+GET route, changes user status from 'pending' to 'active' and returns token if user was confirmed.
 
 **Response**
 ```
 { 
-    "message": "message"
+    token
 }
 ```
 ______________________________
@@ -78,12 +95,31 @@ ______________________________
 
 **/api/auth/google**
 
-GET route, initiates passport-google authentication.
+To use this route , frontend will need to use it this way: window.open(basaeUrl/api/auth/google);
+Authorization will be happening on Google side.
+After that there are two possibilities:
+if signup/login was sucessful:
+/api/auth/login/success
+GET route, that creates a token and sends it to the frontend
+response: {
+                success: true, 
+                message: 'sucess',
+                user: req.user,
+                token: token
+            }
+If something went wrong:
+/login/failed
+GET route, response: {
+            success: false, 
+            message: 'Failure of login attempt'
+        }
 
 Please reference Google auth documentation.
 ______________________________
 
 **/api/auth/google/callback**
+
+This route DOES NOT NEED TO BE FETCHED from frontend. It is an internal route that Google auth uses.
 
 GET route, callback route, saves the info of authenticated user in the database if user doesn't exist. Confirms user validity if user exists.
 
